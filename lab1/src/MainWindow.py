@@ -1,10 +1,10 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QStatusBar, QWidget, QTabWidget, QWIDGETSIZE_MAX, QHBoxLayout, QSizePolicy
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QStatusBar, QWidget, QTabWidget,
+                             QWIDGETSIZE_MAX, QHBoxLayout, QMenuBar)
 from PyQt5.QtCore import QTimer
 from MainTab import MainTab
 from SpamTab import SpamTab
-
-STATUSBAR_MESSAGE_TIMEOUT = 1000 # мс
+import utils.constants as c
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -16,8 +16,8 @@ class MainWindow(QMainWindow):
 
         # компоненты окна приложения
         self.setStatusBar(QStatusBar())
-        self.statusBar().showMessage("Status Bar")
-        self.statusBar().setStyleSheet("border: 3px solid black")
+        self.setMenuBar(QMenuBar())
+        self.menuBar().setVisible(False) # изначально меню скрыто
         self.setWindowTitle("NU PRIVET")
 
         self.mainWidget = QWidget(self)
@@ -30,7 +30,7 @@ class MainWindow(QMainWindow):
         # размеры окна
         self.setMinimumSize(600, 400)
         self.setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX)
-        # self.setStyleSheet("background-color: orange")
+        self.setStyleSheet(f"background-color: {c.DEFAULT_BG_COLOR}; font-size: {c.DEFAULT_FONT_SIZE}px")
 
         # вкладки
         self.mainTab = MainTab(self)
@@ -41,17 +41,54 @@ class MainWindow(QMainWindow):
         self.mainTabDialog.addTab(self.mainTab, "knopochki")
         self.mainTabDialog.addTab(self.spamTab, "spam")
 
-        self.mainTab.titleEditRequested.connect(self.setWindowTitle)
+        self.mainTab.titleEditRequested.connect(self.changeWindowTitle)
         self.mainTab.statusBarMessageSent.connect(self.showStatusBarMessage)
+        self.mainTab.bgColorChanged.connect(self.changeBgColor)
+        self.mainTab.statusBarChanged.connect(self.updateStatusBar)
+        self.mainTab.fontSizeChanged.connect(self.updateFontSize)
 
         self.mainWidget.layout().addWidget(self.mainTabDialog)
 
     def sendSignal(self):
         self.mainTab.updateRunningTime()
 
-    def showStatusBarMessage(self, message):
-        self.statusBar().showMessage(message, msecs=STATUSBAR_MESSAGE_TIMEOUT)
+    def changeWindowTitle(self, newTitle):
+        if newTitle == self.windowTitle():
+            return
+        self.setWindowTitle(newTitle)
+        self.showStatusBarMessage("Изменен заголовок окна")
 
+    def showStatusBarMessage(self, message):
+        self.statusBar().showMessage(message, msecs=c.STATUSBAR_MESSAGE_TIMEOUT)
+
+    def changeBgColor(self, newRGB):
+        styleSheet = self.styleSheet()
+        newBg = f"background-color: {newRGB}"
+        if "background-color" in styleSheet:
+            bgColorIdx = styleSheet.index("background-color: ")
+            currentBg = styleSheet[bgColorIdx: bgColorIdx + 25]
+            newStyleSheet = styleSheet.replace(currentBg, newBg)
+            self.setStyleSheet(newStyleSheet)
+            self.showStatusBarMessage("Изменен цвет фона")
+        else:
+            self.setStyleSheet(styleSheet + newBg)
+
+    def updateStatusBar(self, isVisible):
+        self.statusBar().setVisible(isVisible)
+
+    def updateFontSize(self, newSize):
+        styleSheet = self.styleSheet()
+        newFontSize = f"font-size: {newSize}px"
+        if "font-size" in styleSheet:
+            fontSizeIdx = styleSheet.index("font-size: ")
+            currentSize = styleSheet[fontSizeIdx: fontSizeIdx + 13]
+            print(currentSize)
+            newStyleSheet = styleSheet.replace(currentSize, newFontSize)
+            self.setStyleSheet(newStyleSheet)
+            self.showStatusBarMessage("Изменен цвет фона")
+        else:
+            self.setStyleSheet(styleSheet + newFontSize)
+        self.showStatusBarMessage("Изменен размер шрифта")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
