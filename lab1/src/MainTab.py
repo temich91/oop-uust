@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLCDNumber, QLabel, QPushButton, QCheckBox, \
-    QRadioButton, QLineEdit, QComboBox, QGroupBox, QSlider
+    QRadioButton, QLineEdit, QComboBox, QGroupBox, QSlider, QSpinBox, QSizePolicy
 from PyQt5.QtCore import pyqtSignal, Qt
 import utils.constants as c
 
@@ -51,14 +51,35 @@ class MainTab(QWidget):
         self.statusBarCheckbox.setChecked(True)
         self.statusBarCheckbox.stateChanged.connect(self.updateStatusBar)
 
-        # размер шрифта
-        self.fontSizeDesc = QLabel("Размер шрифта:")
+        # размеры шрифта
+        fontSizeDesc = QLabel("Размер шрифта: Мин.:")
+        maxFontLabel = QLabel("Макс.:")
+        self.minFontSpinBox = QSpinBox()
+        self.minFontSpinBox.setRange(c.MIN_FONT_SIZE, c.MAX_FONT_SIZE)
+        self.minFontSpinBox.setValue(c.DEFAULT_MIN_FONT_SIZE)
+        self.minFontSpinBox.valueChanged.connect(self.updateMinFontSize)
+        # self.minFontSpinBox.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+
+        self.maxFontSpinBox = QSpinBox()
+        self.maxFontSpinBox.setRange(c.MIN_FONT_SIZE, c.MAX_FONT_SIZE)
+        self.maxFontSpinBox.setValue(c.DEFAULT_MAX_FONT_SIZE)
+        self.maxFontSpinBox.valueChanged.connect(self.updateMaxFontSize)
+
+        fontSizeDescLayout = QHBoxLayout()
+        fontSizeDescLayout.addWidget(fontSizeDesc)
+        fontSizeDescLayout.addWidget(self.minFontSpinBox)
+        fontSizeDescLayout.addWidget(maxFontLabel)
+        fontSizeDescLayout.addWidget(self.maxFontSpinBox)
+        # fontSizeDescLayout.setSpacing(0)
+        fontSizeDescLayout.setContentsMargins(0, 0, 0, 0)
+
+        # ползунок размера шрифта
         self.fontSizeSlider = QSlider(Qt.Orientation.Horizontal)
-        self.fontSizeSlider.setMinimum(2)
-        self.fontSizeSlider.setMaximum(30)
+        self.fontSizeSlider.setMinimum(c.DEFAULT_MIN_FONT_SIZE)
+        self.fontSizeSlider.setMaximum(c.DEFAULT_MAX_FONT_SIZE)
         self.fontSizeSlider.setValue(c.DEFAULT_FONT_SIZE)
-        self.fontSizeSlider.setSingleStep(2)
-        self.fontSizeSlider.valueChanged.connect(self.changeFontSize)
+        self.fontSizeSlider.setSingleStep(c.FONT_SLIDER_STEP)
+        self.fontSizeSlider.valueChanged.connect(self.updateFontSize)
         self.fontSizeLabel = QLabel(str(c.DEFAULT_FONT_SIZE))
         fontSizeLayout = QHBoxLayout()
         fontSizeLayout.addWidget(self.fontSizeSlider)
@@ -70,7 +91,7 @@ class MainTab(QWidget):
         appearanceLayout.addWidget(bgColorLabel)
         appearanceLayout.addWidget(self.bgColorDropdown)
         appearanceLayout.addWidget(self.statusBarCheckbox)
-        appearanceLayout.addWidget(self.fontSizeDesc)
+        appearanceLayout.addLayout(fontSizeDescLayout)
         appearanceLayout.addLayout(fontSizeLayout)
         appearanceGroupBox = QGroupBox("Внешний вид приложения")
         appearanceGroupBox.setLayout(appearanceLayout)
@@ -94,6 +115,20 @@ class MainTab(QWidget):
     def updateStatusBar(self, state):
         self.statusBarChanged.emit(state == Qt.CheckState.Checked)
 
-    def changeFontSize(self, size):
-        self.fontSizeLabel.setText(str(size))
-        self.fontSizeChanged.emit(size)
+    def updateFontSize(self, newSize):
+        self.fontSizeLabel.setText(str(newSize))
+        self.fontSizeChanged.emit(newSize)
+
+    def updateMinFontSize(self, newSize):
+        maxFontValue = self.maxFontSpinBox.value()
+        if self.minFontSpinBox.value() > maxFontValue:
+            self.minFontSpinBox.setValue(maxFontValue)
+            return
+        self.fontSizeSlider.setMinimum(newSize)
+
+    def updateMaxFontSize(self, newSize):
+        minFontValue = self.minFontSpinBox.value()
+        if self.maxFontSpinBox.value() < minFontValue:
+            self.maxFontSpinBox.setValue(minFontValue)
+            return
+        self.fontSizeSlider.setMaximum(newSize)

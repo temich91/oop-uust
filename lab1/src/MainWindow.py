@@ -81,11 +81,10 @@ class MainWindow(QMainWindow):
         newFontSize = f"font-size: {newSize}px"
         if "font-size" in styleSheet:
             fontSizeIdx = styleSheet.index("font-size: ")
-            currentSize = styleSheet[fontSizeIdx: fontSizeIdx + 13]
-            print(currentSize)
+            pxIdx = styleSheet.index("px")
+            currentSize = styleSheet[fontSizeIdx: pxIdx + 2]
             newStyleSheet = styleSheet.replace(currentSize, newFontSize)
             self.setStyleSheet(newStyleSheet)
-            self.showStatusBarMessage("Изменен цвет фона")
         else:
             self.setStyleSheet(styleSheet + newFontSize)
         self.showStatusBarMessage("Изменен размер шрифта")
