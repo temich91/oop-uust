@@ -1,8 +1,9 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLCDNumber, QLabel, QPushButton, QCheckBox, \
     QRadioButton, QLineEdit, QComboBox, QGroupBox, QSlider, QSpinBox, QSizePolicy
 from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtGui import QPainter, QBrush
 import utils.constants as c
-
+from CircleWidget import Circle
 
 class MainTab(QWidget):
     """
@@ -15,11 +16,15 @@ class MainTab(QWidget):
     bgColorChanged = pyqtSignal(str) # изменение цвета фона
     statusBarChanged = pyqtSignal(bool) # изменение видимости строки состояния
     fontSizeChanged = pyqtSignal(int) # изменение размера шрифта
+    blinkPeriodChanged = pyqtSignal(int) # изменение периода мигания кружка
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
-        tab_layout = QGridLayout()
-        self.setLayout(tab_layout)
+        tabLayout = QGridLayout()
+        self.setLayout(tabLayout)
+
+        self.circle = Circle(self)
+        self.circle.show()
 
         # отображение времени работы приложения
         self.runningTime = 0
@@ -85,6 +90,18 @@ class MainTab(QWidget):
         fontSizeLayout.addWidget(self.fontSizeSlider)
         fontSizeLayout.addWidget(self.fontSizeLabel)
 
+        # мигающий кружок
+        circlePeriodLabel = QLabel("Период мигания, с.:")
+        self.circlePeriodEdit = QLineEdit()
+        self.circlePeriodEdit.setPlaceholderText("Новый период")
+        blinkingCircleLayout = QHBoxLayout()
+        circleBtn = QPushButton("Обновить")
+        circleBtn.clicked.connect(self.updateBlinkPeriod)
+        blinkingCircleLayout.addWidget(self.circle)
+        blinkingCircleLayout.addWidget(circlePeriodLabel)
+        blinkingCircleLayout.addWidget(self.circlePeriodEdit)
+        blinkingCircleLayout.addWidget(circleBtn)
+
         # layout для настроек окна
         appearanceLayout = QVBoxLayout()
         appearanceLayout.addLayout(titleEditLayout)
@@ -97,12 +114,16 @@ class MainTab(QWidget):
         appearanceGroupBox.setLayout(appearanceLayout)
 
         # общий layout
-        tab_layout.addLayout(stopwatchLayout, 0, 0)
-        tab_layout.addWidget(appearanceGroupBox, 1, 0)
+        tabLayout.addLayout(stopwatchLayout, 0, 0)
+        tabLayout.addWidget(appearanceGroupBox, 1, 0)
+        tabLayout.addLayout(blinkingCircleLayout, 2, 0)
 
     def updateRunningTime(self):
         self.runningTime += 1
+        # обновление секундомера
         self.lcd1.display(self.runningTime)
+        # обновление мигающего круга
+        self.updateCircle()
 
     def updateWindowTitle(self):
         new_title = self.titleEdit.text()
@@ -132,3 +153,19 @@ class MainTab(QWidget):
             self.maxFontSpinBox.setValue(minFontValue)
             return
         self.fontSizeSlider.setMaximum(newSize)
+
+    def updateCircle(self):
+        if self.runningTime % self.circle.blinkPeriod == 0:
+            if self.circle.isPainted:
+                self.circle.setColor(self.bgColorDropdown.currentData())
+            else:
+                self.circle.setColor(Qt.yellow)
+            self.circle.isPainted = not self.circle.isPainted
+
+    def updateBlinkPeriod(self):
+        try:
+            newPeriod = int(self.circlePeriodEdit.text())
+            self.circle.setBlinkPeriod(newPeriod)
+            self.blinkPeriodChanged.emit(newPeriod)
+        except ValueError:
+            return

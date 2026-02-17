@@ -11,7 +11,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         # служебные поля
         self.timer = QTimer(self)
-        self.timer.start(1000)
+        self.timer.start(c.TIMER_PERIOD)
         self.timer.timeout.connect(self.sendSignal)
 
         # компоненты окна приложения
@@ -46,6 +46,7 @@ class MainWindow(QMainWindow):
         self.mainTab.bgColorChanged.connect(self.changeBgColor)
         self.mainTab.statusBarChanged.connect(self.updateStatusBar)
         self.mainTab.fontSizeChanged.connect(self.updateFontSize)
+        self.mainTab.blinkPeriodChanged.connect(self.updateBlinkPeriod)
 
         self.mainWidget.layout().addWidget(self.mainTabDialog)
 
@@ -88,6 +89,9 @@ class MainWindow(QMainWindow):
         else:
             self.setStyleSheet(styleSheet + newFontSize)
         self.showStatusBarMessage("Изменен размер шрифта")
+
+    def updateBlinkPeriod(self, newPeriod):
+        self.showStatusBarMessage(f"Период мигания кружка изменен на {newPeriod}")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
