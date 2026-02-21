@@ -11,3 +11,6 @@ DEFAULT_MAX_FONT_SIZE = 30 # px
 FONT_SLIDER_STEP = 2   # px
 
 CIRCLE_RADIUS = 45 # px
+
+BTNS_GRID_WIDTH = 3 # кол-во кнопок
+BTNS_GRID_HEIGHT = 6 # кол-во кнопок

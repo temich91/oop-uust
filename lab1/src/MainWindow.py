@@ -1,7 +1,8 @@
 import sys
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QStatusBar, QWidget, QTabWidget,
                              QWIDGETSIZE_MAX, QHBoxLayout, QMenuBar)
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, Qt, QPoint
+from PyQt5.QtGui import QCursor, QPainter, QPen, QBrush, QColor
 from MainTab import MainTab
 from SpamTab import SpamTab
 import utils.constants as c
@@ -13,6 +14,7 @@ class MainWindow(QMainWindow):
         self.timer = QTimer(self)
         self.timer.start(c.TIMER_PERIOD)
         self.timer.timeout.connect(self.sendSignal)
+        self.setCursor(QCursor(Qt.UpArrowCursor))
 
         # компоненты окна приложения
         self.setStatusBar(QStatusBar())
@@ -35,7 +37,6 @@ class MainWindow(QMainWindow):
         # вкладки
         self.mainTab = MainTab(self)
         self.spamTab = SpamTab(self)
-        self.spamTab.setStyleSheet("background-color: #FFBF7B")
 
         self.mainTabDialog = QTabWidget(self.mainWidget)
         self.mainTabDialog.addTab(self.mainTab, "knopochki")

@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLCDNumber, QLabel, QPushButton, QCheckBox, \
-    QRadioButton, QLineEdit, QComboBox, QGroupBox, QSlider, QSpinBox, QSizePolicy
+    QLineEdit, QComboBox, QGroupBox, QSlider, QSpinBox
 from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtGui import QPainter, QBrush
 import utils.constants as c
 from CircleWidget import Circle
 
