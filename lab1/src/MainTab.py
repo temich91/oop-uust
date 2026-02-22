@@ -1,6 +1,5 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLCDNumber, QLabel, QPushButton, QCheckBox, \
-    QLineEdit, QComboBox, QGroupBox, QSlider, QSpinBox, QRadioButton, QApplication
-from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLCDNumber, QLabel, QPushButton, QCheckBox, \
+    QLineEdit, QComboBox, QGroupBox, QSlider, QSpinBox, QRadioButton
 from PyQt5.QtCore import pyqtSignal, Qt
 import utils.constants as c
 from CircleWidget import Circle
@@ -20,9 +19,9 @@ class MainTab(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
-        tabLayout = QGridLayout()
+        tabLayout = QVBoxLayout()
         self.setLayout(tabLayout)
-
+        self.setMouseTracking(True)
         self.circle = Circle(self)
         self.circle.show()
 
@@ -118,6 +117,27 @@ class MainTab(QWidget):
         blinkingCircleLayout.addWidget(self.circlePeriodEdit)
         blinkingCircleLayout.addWidget(circleBtn)
 
+        # Координаты курсора
+        self.cursorCoordLabel = QLabel("Координаты курсора:")
+
+        # Обозначение нажатых кнопок мыши
+        mouseBtnPressLabel = QLabel("Последняя нажатая кнопка:")
+        self.leftMouseBtnLabel = QLabel("Левая")
+        self.leftMouseBtnLabel.setStyleSheet("color: gray;")
+
+        self.rightMouseBtnLabel = QLabel("Правая")
+        self.rightMouseBtnLabel.setStyleSheet("color: gray;")
+
+        self.mouseWheelLabel = QLabel("Колесико")
+        self.mouseWheelLabel.setStyleSheet("color: gray;")
+
+        cursorPropsLayout = QHBoxLayout()
+        cursorPropsLayout.addWidget(self.cursorCoordLabel)
+        cursorPropsLayout.addWidget(mouseBtnPressLabel)
+        cursorPropsLayout.addWidget(self.leftMouseBtnLabel)
+        cursorPropsLayout.addWidget(self.rightMouseBtnLabel)
+        cursorPropsLayout.addWidget(self.mouseWheelLabel)
+
         # layout для настроек окна
         appearanceLayout = QVBoxLayout()
         appearanceLayout.addLayout(titleEditLayout)
@@ -130,9 +150,32 @@ class MainTab(QWidget):
         appearanceGroupBox.setLayout(appearanceLayout)
 
         # общий layout
-        tabLayout.addLayout(stopwatchLayout, 0, 0)
-        tabLayout.addWidget(appearanceGroupBox, 1, 0)
-        tabLayout.addLayout(blinkingCircleLayout, 2, 0)
+        tabLayout.addLayout(stopwatchLayout)
+        tabLayout.addWidget(appearanceGroupBox)
+        tabLayout.addLayout(blinkingCircleLayout)
+        tabLayout.addLayout(cursorPropsLayout)
+
+    def mouseMoveEvent(self, event):
+        x = event.pos().x()
+        y = event.pos().y()
+        self.cursorCoordLabel.setText(f"Координаты курсора: ({x}, {y})")
+        self.update()
+
+    def mousePressEvent(self, event):
+        defaultStyle = "color: gray;"
+        leftStyle = defaultStyle
+        rightStyle = defaultStyle
+        wheelStyle = defaultStyle
+        if event.button() == Qt.LeftButton:
+            leftStyle = "color: red"
+        if event.button() == Qt.RightButton:
+            rightStyle = "color: red"
+        if event.button() == Qt.MidButton:
+            wheelStyle = "color: red"
+
+        self.leftMouseBtnLabel.setStyleSheet(leftStyle)
+        self.rightMouseBtnLabel.setStyleSheet(rightStyle)
+        self.mouseWheelLabel.setStyleSheet(wheelStyle)
 
     def updateRunningTime(self):
         self.runningTime += 1
@@ -177,6 +220,8 @@ class MainTab(QWidget):
     def updateBlinkPeriod(self):
         try:
             newPeriod = int(self.circlePeriodEdit.text())
+            if newPeriod < 1:
+                return
             self.circle.setBlinkPeriod(newPeriod)
             self.blinkPeriodChanged.emit(newPeriod)
         except ValueError:

@@ -18,8 +18,11 @@ class MainWindow(QMainWindow):
 
         # компоненты окна приложения
         self.setStatusBar(QStatusBar())
-        self.setMenuBar(QMenuBar())
-        self.menuBar().setVisible(False) # изначально меню скрыто
+
+        menuBar = QMenuBar()
+        menuBar.addAction("Свернуть окно", self.showMinimized)
+        menuBar.addAction("Закрыть окно", self.close)
+        self.setMenuBar(menuBar)
         self.setWindowTitle("NU PRIVET")
 
         self.mainWidget = QWidget(self)
