@@ -1,8 +1,8 @@
 import sys
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QStatusBar, QWidget, QTabWidget,
                              QWIDGETSIZE_MAX, QHBoxLayout, QMenuBar)
-from PyQt5.QtCore import QTimer, Qt, QPoint
-from PyQt5.QtGui import QCursor, QPainter, QPen, QBrush, QColor
+from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtGui import QCursor, QFont
 from MainTab import MainTab
 from SpamTab import SpamTab
 import utils.constants as c
@@ -24,7 +24,7 @@ class MainWindow(QMainWindow):
 
         self.mainWidget = QWidget(self)
         mainWidgetLayout = QHBoxLayout()
-        mainWidgetLayout.setContentsMargins(0,0,0,0)
+        mainWidgetLayout.setContentsMargins(0, 0, 0, 0)
         mainWidgetLayout.setSpacing(0)
         self.mainWidget.setLayout(mainWidgetLayout)
         self.setCentralWidget(self.mainWidget)
@@ -32,7 +32,7 @@ class MainWindow(QMainWindow):
         # размеры окна
         self.setMinimumSize(600, 400)
         self.setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX)
-        self.setStyleSheet(f"background-color: {c.DEFAULT_BG_COLOR}; font-size: {c.DEFAULT_FONT_SIZE}px")
+        self.setStyleSheet(f"background-color: {c.DEFAULT_BG_COLOR}; font-size: {c.DEFAULT_FONT_SIZE}px;")
 
         # вкладки
         self.mainTab = MainTab(self)

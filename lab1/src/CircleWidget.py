@@ -9,15 +9,27 @@ class Circle(QWidget):
         self.setFixedSize(c.CIRCLE_RADIUS, c.CIRCLE_RADIUS)
         self.isPainted = True
         self.color = Qt.yellow
+        self.fillColor = self.color
         self.blinkPeriod = 1 # секунды
 
-    def setColor(self, color: str) -> None:
+    def setColor(self, newColor: Qt.GlobalColor) -> None:
         """
-        Меняет цвет кружка.
-        :param color:
+        Установка нового цвета, отображаемого при мигании.
+        :param newColor: Новый цвет.
         :return: None
         """
-        self.color = color
+        self.color = newColor
+
+    def updateColor(self) -> None:
+        """
+        Меняет цвет заливки кружка.
+        :return: None
+        """
+        if self.isPainted:
+            self.fillColor = Qt.transparent
+        else:
+            self.fillColor = self.color
+        self.isPainted = not self.isPainted
         self.update()
 
     def setBlinkPeriod(self, newPeriod: int):
@@ -32,5 +44,5 @@ class Circle(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.setPen(QPen(Qt.black, 1))
-        painter.setBrush(QBrush(QColor(self.color), Qt.BrushStyle.SolidPattern))
+        painter.setBrush(QBrush(QColor(self.fillColor), Qt.BrushStyle.SolidPattern))
         painter.drawEllipse(0, 0, c.CIRCLE_RADIUS, c.CIRCLE_RADIUS)

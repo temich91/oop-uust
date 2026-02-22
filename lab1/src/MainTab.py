@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLCDNumber, QLabel, QPushButton, QCheckBox, \
-    QLineEdit, QComboBox, QGroupBox, QSlider, QSpinBox
+    QLineEdit, QComboBox, QGroupBox, QSlider, QSpinBox, QRadioButton, QApplication
+from PyQt5.QtGui import QFont
 from PyQt5.QtCore import pyqtSignal, Qt
 import utils.constants as c
 from CircleWidget import Circle
@@ -62,7 +63,6 @@ class MainTab(QWidget):
         self.minFontSpinBox.setRange(c.MIN_FONT_SIZE, c.MAX_FONT_SIZE)
         self.minFontSpinBox.setValue(c.DEFAULT_MIN_FONT_SIZE)
         self.minFontSpinBox.valueChanged.connect(self.updateMinFontSize)
-        # self.minFontSpinBox.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
 
         self.maxFontSpinBox = QSpinBox()
         self.maxFontSpinBox.setRange(c.MIN_FONT_SIZE, c.MAX_FONT_SIZE)
@@ -89,6 +89,22 @@ class MainTab(QWidget):
         fontSizeLayout.addWidget(self.fontSizeSlider)
         fontSizeLayout.addWidget(self.fontSizeLabel)
 
+        # выбор цвета кружка
+        yellowBtn = QRadioButton("Желтый")
+        yellowBtn.toggled.connect(lambda checked, color=yellowBtn.text(): self.updateCircleColor(checked, color))
+        yellowBtn.setChecked(True)
+
+        redBtn = QRadioButton("Красный")
+        redBtn.toggled.connect(lambda checked, color=redBtn.text(): self.updateCircleColor(checked, color))
+
+        blackBtn = QRadioButton("Черный")
+        blackBtn.toggled.connect(lambda checked, color=blackBtn.text(): self.updateCircleColor(checked, color))
+
+        self.circleColorLayout = QHBoxLayout()
+        self.circleColorLayout.addWidget(yellowBtn)
+        self.circleColorLayout.addWidget(redBtn)
+        self.circleColorLayout.addWidget(blackBtn)
+
         # мигающий кружок
         circlePeriodLabel = QLabel("Период мигания, с.:")
         self.circlePeriodEdit = QLineEdit()
@@ -96,6 +112,7 @@ class MainTab(QWidget):
         blinkingCircleLayout = QHBoxLayout()
         circleBtn = QPushButton("Обновить")
         circleBtn.clicked.connect(self.updateBlinkPeriod)
+        blinkingCircleLayout.addLayout(self.circleColorLayout)
         blinkingCircleLayout.addWidget(self.circle)
         blinkingCircleLayout.addWidget(circlePeriodLabel)
         blinkingCircleLayout.addWidget(self.circlePeriodEdit)
@@ -155,11 +172,7 @@ class MainTab(QWidget):
 
     def updateCircle(self):
         if self.runningTime % self.circle.blinkPeriod == 0:
-            if self.circle.isPainted:
-                self.circle.setColor(self.bgColorDropdown.currentData())
-            else:
-                self.circle.setColor(Qt.yellow)
-            self.circle.isPainted = not self.circle.isPainted
+            self.circle.updateColor()
 
     def updateBlinkPeriod(self):
         try:
@@ -168,3 +181,11 @@ class MainTab(QWidget):
             self.blinkPeriodChanged.emit(newPeriod)
         except ValueError:
             return
+
+    def updateCircleColor(self, checked, newColor):
+        if not checked:
+            return
+        colorsDict = {"Желтый": Qt.yellow,
+                      "Красный": Qt.red,
+                      "Черный": Qt.black}
+        self.circle.setColor(colorsDict[newColor])
