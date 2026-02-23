@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLCDNumber, QLabel, QPushButton, QCheckBox, \
     QLineEdit, QComboBox, QGroupBox, QSlider, QSpinBox, QRadioButton
 from PyQt5.QtCore import pyqtSignal, Qt
-import utils.constants as c
-from CircleWidget import Circle
+import src.utils.constants as c
+from src.CircleWidget import Circle
 
 class MainTab(QWidget):
     """

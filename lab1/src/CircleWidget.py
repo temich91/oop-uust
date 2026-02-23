@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainter, QBrush, QPen, QColor
 from PyQt5.QtWidgets import QWidget
-import utils.constants as c
+import src.utils.constants as c
 
 class Circle(QWidget):
     def __init__(self, parent=None):

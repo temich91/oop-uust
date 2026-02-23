@@ -1,8 +1,7 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLCDNumber, QLabel, QPushButton, QCheckBox, \
-    QLineEdit, QComboBox, QGroupBox, QSlider, QSpinBox
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout, QGridLayout,
+                             QLabel, QPushButton, QLineEdit)
 from PyQt5.QtWidgets import QWidget
-import utils.constants as c
+import src.utils.constants as c
 
 class SpamTab(QWidget):
     """

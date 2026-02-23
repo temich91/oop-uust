@@ -1,11 +1,10 @@
-import sys
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QStatusBar, QWidget, QTabWidget,
+from PyQt5.QtWidgets import (QMainWindow, QStatusBar, QWidget, QTabWidget,
                              QWIDGETSIZE_MAX, QHBoxLayout, QMenuBar)
 from PyQt5.QtCore import QTimer, Qt
-from PyQt5.QtGui import QCursor, QFont
-from MainTab import MainTab
-from SpamTab import SpamTab
-import utils.constants as c
+from PyQt5.QtGui import QCursor
+from src.MainTab import MainTab
+from src.SpamTab import SpamTab
+from src.utils import constants as c
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -96,9 +95,3 @@ class MainWindow(QMainWindow):
 
     def updateBlinkPeriod(self, newPeriod):
         self.showStatusBarMessage(f"Период мигания кружка изменен на {newPeriod}")
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    app.exec()
