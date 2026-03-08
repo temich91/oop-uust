@@ -32,8 +32,15 @@ class CelestialBody{
     }
 
     void print_info() {
-      printf("Название объекта: %s\nМасса: %d\nРазмер: %d\n", name.c_str(), mass, radius);
+      printf("Название объекта: %s\nМасса: %d\nРазмер: %d\nОбъем: %.3lf\n", name.c_str(), mass, radius, count_volume());
     }
+  
+  protected:
+    double count_volume();
+};
+
+double CelestialBody::count_volume() {
+  return 4/3 * 3.14 * radius * radius * radius;
 };
 
 void create_cb_static() {
