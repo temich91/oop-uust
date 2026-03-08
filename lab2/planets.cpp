@@ -4,7 +4,6 @@
 class Moon: public CelestialBody {};
 
 class Planet: public CelestialBody {
-  // Абстрактный класс планеты    
   public:
     bool is_exoplanet;
     int n_moons;
@@ -14,18 +13,18 @@ class Planet: public CelestialBody {
       this->is_exoplanet = false;
       this->n_moons = 0;
       this->moons = new Moon*[n_moons];
-      printf("  Planet %s создана\n", this->name);
+      printf("  Planet()\n");
     }
 
-    Planet(const std::string name, int mass, int radius,
-           const bool is_exoplanet, Moon** moons, int n_moons) : CelestialBody(name, mass, radius) {
+    Planet(const std::string& name, int mass, int radius,
+           bool is_exoplanet, Moon** moons, int n_moons) : CelestialBody(name, mass, radius) {
       this->is_exoplanet = is_exoplanet;
       this->n_moons = n_moons;
       this->moons = new Moon*[n_moons];
       for (int i = 0; i < n_moons; ++i) {
         this->moons[i] = moons[i];
       }
-      printf("  Planet %s создана\n", this->name.c_str());
+      printf("  Planet(const std::string& name, int mass, int radius, bool is_exoplanet, Moon** moons, int n_moons)\n");
     }
 
     Planet(const Planet& planet) : CelestialBody(planet) {
@@ -35,15 +34,26 @@ class Planet: public CelestialBody {
       for (int i = 0; i < this->n_moons; ++i) {
         this->moons[i] = planet.moons[i];
       } 
-      printf("  Planet %s создана\n", this->name.c_str());
+      printf("  Planet(const Planet& planet)\n");
     }
 
     ~Planet() {
       for (int i=0; i < this->n_moons; ++i) {
         delete this->moons[i];
       }
-      delete this->moons;
-      printf("  Planet %s уничтожена\n", this->name.c_str());
+      delete[] this->moons;
+      printf("  ~Planet\n");
+    }
+
+    void print_info() {
+      // вызов родительского метода
+      CelestialBody::print_info();
+      // дополнение
+      if (this->is_exoplanet) {
+        printf("Является экзопланетой\n");
+      } else {
+        printf("Не является экзопланетой\n");
+      }
     }
 };
 
@@ -57,10 +67,8 @@ int main() {
   maggr[0] = m1;
   maggr[1] = m2;
 
-  CelestialBody cb1 = Planet("Mars", 1000, 6378, false, maggr, 2);
+  Planet cb1("Mars", 1000, 6378, true, maggr, 2);
   cb1.print_info();
 
-  delete m1;
-  delete m2;
   return 0;
 }
