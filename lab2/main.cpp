@@ -1,50 +1,8 @@
 #include <iostream>
-#include <windows.h>
+#include "planets.cpp"
 
-class CelestialBody{
-  // Базовый класс небесного тела
-
-  public:
-    std::string name;
-    int mass;
-    int radius;
-
-    CelestialBody() {
-      this->name = "default";
-      this->mass = 0;
-      this->radius = 0;
-      printf("CelestialBody()\n");
-    }
-
-    CelestialBody(const std::string& name, int mass, int radius): name(name), mass(mass), radius(radius) {
-      printf("CelestialBody(const std::string& name, int mass, int radius)\n");
-    }
-
-    CelestialBody(const CelestialBody& cb) {
-      this->name = cb.name;
-      this->mass = cb.mass;
-      this->radius = cb.radius;
-      printf("CelestialBody(const CelestialBody& cb)\n");
-    }
-
-    ~CelestialBody() {
-      printf("~CelestialBody()\n");
-    }
-
-    void print_info() {
-      printf("Название объекта: %s\nМасса: %d\nРазмер: %d\nОбъем: %.3lf\n", name.c_str(), mass, radius, count_volume());
-    }
-  
-  protected:
-    double count_volume();
-};
-
-double CelestialBody::count_volume() {
-  return 4/3 * 3.14 * radius * radius * radius;
-};
-
+// Шаблонная функция тестирования статического создания объектов
 void create_cb_static() {
-  // Статическое создание
   CelestialBody cb1; // по умолчанию
   cb1.print_info();
   CelestialBody cb2("Mars", 12400, 3400); // с параметрами
@@ -53,8 +11,8 @@ void create_cb_static() {
   cb3.print_info();
 };
 
+// Шаблонная функция тестирования динамического создания объектов
 void create_cb_dynamic() {
-  // динамическое создание
   CelestialBody* cb1 = new CelestialBody; // по умолчанию
   cb1->print_info();
   CelestialBody* cb2 = new CelestialBody("Mars", 12400, 3400); // с параметрами
@@ -66,3 +24,22 @@ void create_cb_dynamic() {
   delete cb2;
   delete cb3;
 };
+
+int main() {
+  SetConsoleCP(65001);
+  SetConsoleOutputCP(65001);
+  //   create_cb_static();
+  Planet p1;// по умолчанию
+
+  Moon m1("The Moon", 1000, 10);
+  Moon* m2 = new Moon;
+  Moon* maggr = new Moon[1];
+  maggr[0] = *m2;
+
+  Planet p2("Mars", 1000, 6378, true, m1, maggr, 1); // с параметрами
+  Planet p3 = p2; // копирование
+  p3.print_info();
+  delete m2;
+  delete[] maggr;
+  return 0;
+}

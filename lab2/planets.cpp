@@ -1,5 +1,5 @@
 #include <iostream>
-#include "main.cpp"
+#include "celestial_body.cpp"
 
 class Moon: public CelestialBody {
   public:
@@ -11,7 +11,7 @@ class Moon: public CelestialBody {
 
     Moon(const std::string& name, int mass, int radius) : CelestialBody(name, mass, radius) {
       this->density = count_density();
-      printf("  Moon(const std::string& name, int mass, int radius, double density)\n");
+      printf("  Moon(const std::string& name, int mass, int radius)\n");
     }
 
     Moon(const Moon& moon) : CelestialBody(moon) {
@@ -58,7 +58,7 @@ class Planet: public CelestialBody {
       for (int i = 0; i < n_extra_moons; ++i) {
         this->extra_moons[i] = extra_moons[i];
       }
-      printf("  Planet(const std::string& name, int mass, int radius, bool is_exoplanet, Moon** moons, int n_moons)\n");
+      printf("  Planet(const std::string& name, int mass, int radius, bool is_exoplanet, const Moon& main_moon, const Moon* extra_moons, int n_extra_moons)\n");
     }
 
     Planet(const Planet& planet) : CelestialBody(planet) {
@@ -86,21 +86,6 @@ class Planet: public CelestialBody {
       } else {
         printf("Не является экзопланетой\n");
       }
+      printf("Количество спутников: %d\n", n_extra_moons + 1);
     }
 };
-
-int main() {
-  SetConsoleCP(65001);
-  SetConsoleOutputCP(65001);
-
-  Moon m1("wasd", 1000, 10);
-  Moon* m2 = new Moon;
-  Moon* maggr = new Moon[1];
-  maggr[0] = *m2;
-
-  Planet cb1("Mars", 1000, 6378, true, m1, maggr, 1);
-  cb1.print_info();
-  delete m2;
-  delete[] maggr;
-  return 0;
-}
