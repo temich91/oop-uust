@@ -32,14 +32,12 @@ int main() {
   Planet p1;// по умолчанию
 
   Moon m1("The Moon", 1000, 10);
-  Moon* m2 = new Moon;
-  Moon* maggr = new Moon[1];
-  maggr[0] = *m2;
+  Moon* marr = new Moon[1];
+  marr[0] = m1;
 
-  Planet p2("Mars", 1000, 6378, true, m1, maggr, 1); // с параметрами
+  Planet p2("Mars", 1000, 6378, true, m1, marr, 1); // с параметрами
   Planet p3 = p2; // копирование
   p3.print_info();
-  delete m2;
-  delete[] maggr;
+  delete[] marr;
   return 0;
 }
