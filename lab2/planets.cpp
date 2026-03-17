@@ -39,42 +39,32 @@ class Moon: public CelestialBody {
 class Planet: public CelestialBody {
   public:
     bool is_exoplanet;
-    int n_extra_moons;
     Moon main_moon;
-    Moon* extra_moons;
+    Moon* secondary_moon;
 
     Planet() : CelestialBody() {
       this->is_exoplanet = false;
-      this->n_extra_moons = 0;
-      this->extra_moons = nullptr;
+      this->secondary_moon = new Moon();
       printf("  Planet()\n");
     }
 
     Planet(const std::string& name, int mass, int radius,
-           bool is_exoplanet, const Moon& main_moon, const Moon* extra_moons, int n_extra_moons) : CelestialBody(name, mass, radius), main_moon(main_moon) {
+           bool is_exoplanet, const Moon& main_moon, const Moon* secondary_moon) : CelestialBody(name, mass, radius), main_moon(main_moon) {
       this->is_exoplanet = is_exoplanet;
-      this->n_extra_moons = n_extra_moons;
-      this->extra_moons = new Moon[n_extra_moons];
-      for (int i = 0; i < n_extra_moons; ++i) {
-        this->extra_moons[i] = extra_moons[i];
-      }
-      printf("  Planet(const std::string& name, int mass, int radius, bool is_exoplanet, const Moon& main_moon, const Moon* extra_moons, int n_extra_moons)\n");
+      this->secondary_moon = new Moon(*secondary_moon);
+      printf("  Planet(const std::string& name, int mass, int radius, bool is_exoplanet, const Moon& main_moon, const Moon* secondary_moon)\n");
     }
 
     Planet(const Planet& planet) : CelestialBody(planet) {
       this->is_exoplanet = planet.is_exoplanet;
-      this->n_extra_moons = planet.n_extra_moons;
       this->main_moon = planet.main_moon;
-      this->extra_moons = new Moon[this->n_extra_moons];
-      for (int i = 0; i < this->n_extra_moons; ++i) {
-        this->extra_moons[i] = planet.extra_moons[i];
-      } 
+      this->secondary_moon = new Moon(*planet.secondary_moon);
       printf("  Planet(const Planet& planet)\n");
     }
 
     ~Planet() {
-      delete[] this->extra_moons;
-      printf("  ~Planet\n");
+      delete this->secondary_moon;
+      printf("  ~Planet()\n");
     }
 
     void print_info() {
@@ -86,6 +76,5 @@ class Planet: public CelestialBody {
       } else {
         printf("Не является экзопланетой\n");
       }
-      printf("Количество спутников: %d\n", n_extra_moons + 1);
     }
 };
