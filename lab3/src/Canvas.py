@@ -14,6 +14,7 @@ class Canvas(QWidget):
         super().__init__(parent=parent)
         self.allCircles = []
         self.selectedCircles = []
+        self.setFocusPolicy(Qt.StrongFocus) # виджет принимает события клавитуры
 
     def add(self, pos):
         newCircle = CCircle(self, pos.x(), pos.y())
@@ -21,10 +22,17 @@ class Canvas(QWidget):
         self.allCircles.append(newCircle)
         self.update()
 
-    def remove(self, circle):
-        self.allCircles.remove(circle)
+    def removeCircle(self, circle):
+        """
+        Полностью удаляет виджет круга.
+        """
+        if circle in self.allCircles:
+            self.allCircles.remove(circle)
+        if circle in self.selectedCircles:
+            self.selectedCircles.remove(circle)
         circle.setParent(None)
         circle.deleteLater()
+        self.update()
 
     def draw(self):
         for circle in self.allCircles:
@@ -34,18 +42,26 @@ class Canvas(QWidget):
         self.selectedCircles.append(circle)
         circle.select()
 
-    def unselect(self, circle):
-        self.selectedCircles.remove(circle)
+    def unselectCircle(self, circle):
+        if circle in self.selectedCircles:
+            self.selectedCircles.remove(circle)
         circle.unselect()
 
     def clearSelection(self):
-        for circle in self.selectedCircles:
+        for circle in self.selectedCircles[:]:
             circle.unselect()
         self.selectedCircles.clear()
 
-    def mousePressEvent(self, event):
-        super().mousePressEvent(event)
+    def keyPressEvent(self, event):
+        # Обработка нажатия клавиши Delete
+        # Удаление всех выделенных кругов
+        if event.key() == Qt.Key_Delete:
+            c = 0
+            for circle in self.selectedCircles.copy():
+                self.removeCircle(circle)
+        event.accept()
 
+    def mousePressEvent(self, event):
         # Обработка нажатия ЛКМ
         if event.button() == Qt.LeftButton:
             canvas_pos = event.pos() # точка клика в координатах Canvas
@@ -59,7 +75,7 @@ class Canvas(QWidget):
 
             if clickedCircle:
                 if clickedCircle in self.selectedCircles:
-                    self.unselect(clickedCircle)
+                    self.unselectCircle(clickedCircle)
                 else:
                     if event.modifiers() != Qt.ControlModifier:
                         self.clearSelection()
@@ -70,3 +86,4 @@ class Canvas(QWidget):
                 self.add(canvas_pos)
                 if event.modifiers() == Qt.ControlModifier:
                     self.select(self.allCircles[-1])
+        event.accept()
