@@ -41,6 +41,7 @@ class Canvas(QWidget):
     def clearSelection(self):
         for circle in self.selectedCircles:
             circle.unselect()
+        self.selectedCircles.clear()
 
     def mousePressEvent(self, event):
         super().mousePressEvent(event)
@@ -48,31 +49,24 @@ class Canvas(QWidget):
         # Обработка нажатия ЛКМ
         if event.button() == Qt.LeftButton:
             canvas_pos = event.pos() # точка клика в координатах Canvas
-            circlePressed = False # нажат ли хотя бы один круг
+            clickedCircle = None
+            # Поиск нажатого круга
             for circle in self.allCircles:
                 circ_pos = circle.mapFromParent(canvas_pos) # точка в координатах круга
                 if circle.containsPoint(QPoint(circ_pos.x(), circ_pos.y())):
-                    print("da")
-                    circlePressed = True
-                    # если Ctrl нажат, выделение круга инвертируется
-                    if event.modifiers() == Qt.ControlModifier:
-                        if circle not in self.selectedCircles:
-                            self.select(circle)
-                        else:
-                            self.unselect(circle)
+                    clickedCircle = circle
+                    break
 
-                    # иначе отменяются выделения всех кругов, кроме нажатого сейчас
-                    else:
+            if clickedCircle:
+                if clickedCircle in self.selectedCircles:
+                    self.unselect(clickedCircle)
+                else:
+                    if event.modifiers() != Qt.ControlModifier:
                         self.clearSelection()
-                        if circle not in self.selectedCircles:
-                            self.select(circle)
-                        else:
-                            self.unselect(circle)
-
-            # снятие выделения объектов если нажали ни на один из кругов
-            if not circlePressed:
-                if self.selectedCircles:
-                    self.clearSelection()
+                    self.select(clickedCircle)
+            else:
+                # снятие выделения объектов если нажали ни на один из кругов
+                self.clearSelection()
                 self.add(canvas_pos)
                 if event.modifiers() == Qt.ControlModifier:
                     self.select(self.allCircles[-1])
