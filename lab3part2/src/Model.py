@@ -11,7 +11,6 @@ class Model:
         self.a = config["a"]
         self.b = config["b"]
         self.c = config["c"]
-
         self.observers = []
 
     def addObserver(self, newObserver):
@@ -22,11 +21,14 @@ class Model:
         if observer in self.observers:
             self.observers.remove(observer)
 
-    def _checkValue(self, value: int):
+    def _checkValue(self, value: str):
         """
         Проверка общих ограничений на вводимые значения переменных.
         """
-        return 0 <= value <= 100
+        if not value.isdigit():
+            return False
+
+        return 0 <= int(value) <= 100
 
     def getA(self):
         return self.a
@@ -37,33 +39,43 @@ class Model:
     def getC(self):
         return self.c
 
-    def setA(self, newValue):
-        if not self._checkValue(newValue):
+    def setA(self, value):
+        if (not isinstance(value, int)) and (not self._checkValue(value)):
+            self.notify()
             return
 
+        newValue = int(value)
         self.a = newValue
         if newValue > self.b:
             self.setB(newValue)
-
-        self.notify()
-
-    def setB(self, newValue):
-        if not self._checkValue(newValue):
-            return
-
-        self.b = newValue
-        if newValue < self.a:
-            self.setA(newValue)
         if newValue > self.c:
             self.setC(newValue)
 
         self.notify()
 
-    def setC(self, newValue):
-        if not self._checkValue(newValue):
+    def setB(self, value):
+        if (not isinstance(value, int)) and (not self._checkValue(value)):
+            self.notify()
             return
 
+        newValue = int(value)
+        self.b = newValue
+        if newValue < self.a:
+            self.b = self.a
+        if newValue > self.c:
+            self.b = self.c
+
+        self.notify()
+
+    def setC(self, value):
+        if (not isinstance(value, int)) and (not self._checkValue(value)):
+            self.notify()
+            return
+
+        newValue = int(value)
         self.c = newValue
+        if newValue < self.a:
+            self.setA(newValue)
         if newValue < self.b:
             self.setB(newValue)
 

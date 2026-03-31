@@ -6,7 +6,7 @@ from lab3part2.src.NumberEdit import NumberEdit
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setFixedSize(QSize(700, 400))
+        self.setFixedSize(QSize(700, 270))
         mainWidget = QWidget(self)
         mainLayout = QHBoxLayout()
 
@@ -29,11 +29,21 @@ class MainWindow(QMainWindow):
 
         mainWidget.setLayout(mainLayout)
         self.setCentralWidget(mainWidget)
+        self.model.notify()
 
     def updateValues(self, a, b, c):
         """
         Вызов обновления значений переменных в формах A, B, C из модели.
         """
+
         self.widgetA.updateValue(a)
         self.widgetB.updateValue(b)
         self.widgetC.updateValue(c)
+
+    def closeEvent(self, event):
+        """
+        Сохранения состояния модели при закрытии окна.
+        """
+
+        self.model.saveValues()
+        super().closeEvent(event)
