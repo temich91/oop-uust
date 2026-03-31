@@ -45,6 +45,8 @@ class Model:
         if newValue > self.b:
             self.setB(newValue)
 
+        self.notify()
+
     def setB(self, newValue):
         if not self._checkValue(newValue):
             return
@@ -55,6 +57,8 @@ class Model:
         if newValue > self.c:
             self.setC(newValue)
 
+        self.notify()
+
     def setC(self, newValue):
         if not self._checkValue(newValue):
             return
@@ -62,6 +66,8 @@ class Model:
         self.c = newValue
         if newValue < self.b:
             self.setB(newValue)
+
+        self.notify()
 
     def saveValues(self):
         """
@@ -73,3 +79,11 @@ class Model:
                 "c": self.c}
         with open(CONFIG_PATH, "w") as file:
             json.dump(data, file, indent=2)
+
+    def notify(self):
+        """
+        Вызов у наблюдателей обновления значений A, B, C.
+        """
+
+        for observer in self.observers:
+            observer(self.getA(), self.getB(), self.getC())
