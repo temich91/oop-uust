@@ -13,6 +13,8 @@ class Model:
         self.c = config["c"]
         self.observers = []
 
+        self.updates_count = 0
+
     def addObserver(self, newObserver):
         if newObserver not in self.observers:
             self.observers.append(newObserver)
@@ -25,9 +27,6 @@ class Model:
         """
         Проверка общих ограничений на вводимые значения переменных.
         """
-        if not value.isdigit():
-            return False
-
         return 0 <= int(value) <= 100
 
     def getA(self):
@@ -39,47 +38,55 @@ class Model:
     def getC(self):
         return self.c
 
+    def setValues(self, a=None, b=None, c=None):
+        isChanged = False
+
+        if a is not None and a != self.a:
+            self.a = a
+            isChanged = True
+
+        if b is not None and b != self.b:
+            self.b = b
+            isChanged = True
+
+        if c is not None and c != self.c:
+            self.c = c
+            isChanged = True
+
+        return isChanged
+
     def setA(self, value):
-        if (not isinstance(value, int)) and (not self._checkValue(value)):
-            self.notify()
+        if not self._checkValue(value):
             return
 
-        newValue = int(value)
-        self.a = newValue
-        if newValue > self.b:
-            self.setB(newValue)
-        if newValue > self.c:
-            self.setC(newValue)
+        newA = value
+        newB = max(newA, self.b)
+        newC = max(newA, self.c)
 
-        self.notify()
+        if self.setValues(newA, newB, newC):
+            self.notify()
 
     def setB(self, value):
-        if (not isinstance(value, int)) and (not self._checkValue(value)):
-            self.notify()
+        if not self._checkValue(value):
             return
 
-        newValue = int(value)
-        self.b = newValue
-        if newValue < self.a:
-            self.b = self.a
-        if newValue > self.c:
-            self.b = self.c
+        newB = value
+        newB = max(newB, self.a)
+        newB = min(newB, self.c)
 
-        self.notify()
+        if self.setValues(b=newB):
+            self.notify()
 
     def setC(self, value):
-        if (not isinstance(value, int)) and (not self._checkValue(value)):
-            self.notify()
+        if not self._checkValue(value):
             return
 
-        newValue = int(value)
-        self.c = newValue
-        if newValue < self.a:
-            self.setA(newValue)
-        if newValue < self.b:
-            self.setB(newValue)
+        newC = value
+        newA = min(self.a, newC)
+        newB = min(self.b, newC)
 
-        self.notify()
+        if self.setValues(newA, newB, newC):
+            self.notify()
 
     def saveValues(self):
         """
@@ -96,6 +103,7 @@ class Model:
         """
         Вызов у наблюдателей обновления значений A, B, C.
         """
-
+        self.updates_count += 1
+        print(f"обновление #{self.updates_count}")
         for observer in self.observers:
             observer(self.getA(), self.getB(), self.getC())
