@@ -23,11 +23,11 @@ class Model:
         if observer in self.observers:
             self.observers.remove(observer)
 
-    def _checkValue(self, value: str):
+    def _checkValue(self, value):
         """
         Проверка общих ограничений на вводимые значения переменных.
         """
-        return 0 <= int(value) <= 100
+        return 0 <= value <= 100
 
     def getA(self):
         return self.a
