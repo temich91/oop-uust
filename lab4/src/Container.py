@@ -1,6 +1,8 @@
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QColor
+
+from lab4.src.constants import COORDS_MOVEMENT
 from lab4.src.shapes import *
 from lab4.src.Shape import Shape
 
@@ -49,13 +51,38 @@ class Container(QWidget):
         for shape in self.allShapes[:]:
             shape.unselect()
 
+    def moveShapes(self, dx, dy):
+        for shape in self.allShapes:
+            if shape.isSelected:
+                shape.move(shape.x() + dx, shape.y() + dy)
+
+    def updateColor(self, newColor):
+        self.currentColor = newColor
+        for shape in self.allShapes:
+            if shape.isSelected:
+                shape.changeColor(newColor)
+        self.update()
+
     def keyPressEvent(self, event):
         # Обработка нажатия клавиши Delete
-        # Удаление всех выделенных кругов
+        # Удаление всех выделенных фигур
         if event.key() == Qt.Key_Delete:
             for shape in self.allShapes.copy():
                 if shape.isSelected:
                     self.removeShape(shape)
+
+        # Перемещение фигур по нажатию стрелок
+        dx, dy = 0, 0 # изменение координат в пикселях
+        if event.key() == Qt.Key_Left:
+            dx -= COORDS_MOVEMENT
+        if event.key() == Qt.Key_Right:
+            dx += COORDS_MOVEMENT
+        if event.key() == Qt.Key_Up:
+            dy -= COORDS_MOVEMENT
+        if event.key() == Qt.Key_Down:
+            dy += COORDS_MOVEMENT
+
+        self.moveShapes(dx, dy)
         event.accept()
 
     def mousePressEvent(self, event):

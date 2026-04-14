@@ -1,7 +1,7 @@
-from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QAction
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QAction, QColorDialog
 from lab4.src.shapes import *
 from .Container import Container
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
         mainLayout.addWidget(self.container)
         self.mainWidget.setLayout(mainLayout)
 
-        # Меню
+        # Меню с выбором фигур и параметрами фигуры
         menubar = self.menuBar()
 
         shapeMenu = menubar.addMenu("Фигуры")
@@ -34,11 +34,18 @@ class MainWindow(QMainWindow):
         rectangleAction = QAction("Прямоугольник", self)
         rectangleAction.triggered.connect(lambda: self.container.changeShape(Rectangle))
 
-
-        colorMenu = menubar.addMenu("Изменить цвет")
-        # save_action.setShortcut("Ctrl+S")
-
         shapeMenu.addAction(circleAction)
         shapeMenu.addAction(squareAction)
         shapeMenu.addAction(triangleAction)
         shapeMenu.addAction(rectangleAction)
+
+        optionsMenu = menubar.addMenu("Параметры фигур")
+        changeColorAction = QAction("Изменить цвет", self)
+        changeColorAction.triggered.connect(self.chooseColor)
+        optionsMenu.addAction(changeColorAction)
+
+    def chooseColor(self):
+        color = QColorDialog.getColor()
+
+        if color.isValid():
+            self.container.updateColor(color)

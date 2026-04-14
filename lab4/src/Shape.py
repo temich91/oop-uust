@@ -10,8 +10,8 @@ class Shape(QWidget):
         self.isSelected = False
 
         # координаты центра
-        self.x = x
-        self.y = y
+        self.center_x = x
+        self.center_y = y
 
         self.color = color
         self.penColor = self.color
