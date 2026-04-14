@@ -1,0 +1,7 @@
+.idea/
+.venv/
+.vscode/
+output/
+lab2/main.
+test.cpp
+test.py
