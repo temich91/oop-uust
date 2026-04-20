@@ -7,15 +7,12 @@ class Triangle(Shape):
     def __init__(self, parent, x, y, color):
         super().__init__(parent, x, y, color)
 
-        self.setGeometry(x - self.width() // 2,
-                         y - self.height() // 2,
-                         self.width(), self.height())
-        self.polygon = QPolygon([QPoint(self.width() // 2, PEN_WIDTH),
+    def drawShape(self, painter):
+        polygon = QPolygon([QPoint(self.width() // 2, PEN_WIDTH),
                                  QPoint(PEN_WIDTH, self.height() - PEN_WIDTH),
                                  QPoint(self.width() - PEN_WIDTH, self.height() - PEN_WIDTH)])
 
-    def drawShape(self, painter):
-        painter.drawPolygon(self.polygon)
+        painter.drawPolygon(polygon)
 
     def containsPoint(self, pos):
         return self.polygon.containsPoint(pos, 0)
