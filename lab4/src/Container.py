@@ -25,9 +25,10 @@ class Container(QWidget):
 
     def add(self, pos):
         newShape = self.currentShape(self, pos.x(), pos.y(), self.currentColor)
-        newShape.show()
-        self.allShapes.append(newShape)
-        self.update()
+        if not self.checkBorder(newShape, 0, 0):
+            newShape.show()
+            self.allShapes.append(newShape)
+            self.update()
 
     def changeShape(self, newShape):
         self.currentShape = newShape
@@ -52,6 +53,8 @@ class Container(QWidget):
             shape.unselect()
 
     def moveShapes(self, dx, dy):
+        if any(self.checkBorder(shape, dx, dy) for shape in self.allShapes):
+            return
         for shape in self.allShapes:
             if shape.isSelected:
                 shape.move(shape.x() + dx, shape.y() + dy)
@@ -62,6 +65,12 @@ class Container(QWidget):
             if shape.isSelected:
                 shape.changeColor(newColor)
         self.update()
+
+    def checkBorder(self, shape, dx, dy):
+        containerRect = self.rect()
+        shapeRect = shape.geometry().translated(dx, dy)
+
+        return not containerRect.contains(shapeRect)
 
     def keyPressEvent(self, event):
         # Обработка нажатия клавиши Delete
@@ -82,23 +91,26 @@ class Container(QWidget):
         if event.key() == Qt.Key_Down:
             dy += COORDS_MOVEMENT
 
-        self.moveShapes(dx, dy)
+        if dx or dy:
+            self.moveShapes(dx, dy)
         event.accept()
 
     def mousePressEvent(self, event):
         # Обработка нажатия ЛКМ
         if event.button() == Qt.LeftButton:
-            canvas_pos = event.pos() # точка клика в координатах Canvas
+            canvas_pos = event.pos() # точка клика в координатах контейнера
             clicked = None
-            # Поиск нажатого круга
+            # Поиск нажатой фигуры
             for shape in self.allShapes[::-1]:
-                circ_pos = shape.mapFromParent(canvas_pos) # точка в координатах круга
-                if shape.containsPoint(QPoint(circ_pos.x(), circ_pos.y())):
+                circ_pos = shape.mapFromParent(canvas_pos) # точка в координатах фигуры
+                if shape.containsPoint(circ_pos):
                     clicked = shape
                     break
 
             if clicked:
                 if clicked.isSelected:
+                    if event.modifiers() != Qt.ControlModifier:
+                        self.clearSelection()
                     clicked.unselect()
                 else:
                     if event.modifiers() != Qt.ControlModifier:
@@ -108,6 +120,6 @@ class Container(QWidget):
                 # снятие выделения объектов если нажали ни на один из кругов
                 self.clearSelection()
                 self.add(canvas_pos)
-                if event.modifiers() == Qt.ControlModifier:
+                if event.modifiers() & Qt.ControlModifier:
                     self.allShapes[-1].select()
         event.accept()
